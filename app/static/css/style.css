@@ -107,6 +107,11 @@ h1 {
     transform: none;
 }
 
+.cell.revealed:hover {
+    background-color: #e8f5e9; /* No hover effect on revealed cells */
+    transform: none;
+}
+
 /* --- Flagged Cells --- */
 .cell.flagged {
     background-color: #ffd54f; /* Yellow-ish for flag visibility */

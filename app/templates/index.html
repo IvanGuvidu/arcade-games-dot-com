@@ -26,13 +26,12 @@
                     <div class="cell" onClick="revealCell(this, {{i}}, {{j}})" onContextMenu="flagCell(event, this)"></div>
                 {% endfor %}
             {% endfor %}
-        </div>
-        <div class="controls">
+    </div>
+    <div class="controls">
             <button class="hint" onClick="restartGame()">Restart Game</button>
-            <button class="hint" onClick="getCellHint()">Hint</button>
+            <button class="hint">Hint</button>
             <button class="hint" onClick="window.location.href='/'">Home</button>
             <button class="hint" onClick="window.location.href='/logout'">Logout</button>
-        </div>
     </div>
     <script>
         async function revealCell(cell, row, col) {
@@ -70,6 +69,7 @@
                 document.getElementById('victoryMessage').style.display = 'block';
             }
         }
+
         
         function flagCell(event, cell) {
             event.preventDefault();
@@ -91,6 +91,7 @@
                         console.log('Flags placed: ' + data.flagged);
                     }
                 });
+                cell.classList.toggle('flagged');
             }
         }
         async function restartGame() {

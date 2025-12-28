@@ -2,12 +2,26 @@ from flask import current_app, jsonify, request, render_template, session, redir
 from .minesweeper.board_generation import generate_mines
 from .minesweeper.board_reveal import check_victory, reveal_cells
 from .minesweeper.solver import MinesweeperSolver
+from .board.board_generation import generate_mines
+from .board.board_reveal import check_victory, reveal_cells, reveal_cell_hint
 from .games import tic_tac_toe as ttt
 
 @current_app.route('/')
 def home():
     if not session.get('logged_in'):
         return render_template('login.html')
+    # If not logged in, show login page
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    
+    # Reset all game states when returning to home
+    session['board'] = None
+    session['first_move'] = True
+    session['revealed_cells'] = []
+    session['ttt_board'] = None
+    session['ttt_current_player'] = 'X'
+    
+    # Show the game selection home page
     return render_template('home.html')
 
 @current_app.route('/minesweeper')
@@ -16,6 +30,14 @@ def minesweeper():
     session['first_move'] = True
     if not session.get('logged_in'):
         return render_template('login.html')
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    
+    # Reset minesweeper game state when entering the game
+    session['board'] = None
+    session['first_move'] = True
+    session['revealed_cells'] = []
+    
     return render_template('index.html', n=10, m=10)
 
 @current_app.route('/snake')
@@ -28,10 +50,16 @@ def snake():
 def tic_tac_toe():
     if not session.get('logged_in'):
         return render_template('login.html')
+    
+    # Reset tic-tac-toe game state when entering the game
+    session['ttt_board'] = None
+    session['ttt_current_player'] = 'X'
+    
     return render_template('tic_tac_toe.html')
 
 @current_app.route('/login', methods=['GET', 'POST'])
 def login():
+    # If already logged in, go to home
     if session.get('logged_in'):
         return redirect(url_for('home'))
 
@@ -40,16 +68,25 @@ def login():
         session['logged_in'] = True
         session['username'] = username or 'Player'
 
+        # Minimal login: accept any credentials and mark session
+        username = request.form.get('username')
+        # password is received but not validated in this simple demo
+        session['logged_in'] = True
+        session['username'] = username or 'Player'
+
+        # Reset game state on login
         session['board'] = None
         session['first_move'] = True
         session['revealed_cells'] = []
 
         return redirect(url_for('home'))
 
+    # GET -> render login page
     return render_template('login.html')
 
 @current_app.route('/logout')
 def logout():
+    # Clear session and return to login
     session.clear()
     return redirect(url_for('home'))
 
@@ -177,17 +214,21 @@ def tic_tac_toe_move():
     col = data['col']
     
     if 'ttt_board' not in session:
+    # Initialize board if not exists or is None
+    if 'ttt_board' not in session or session['ttt_board'] is None:
         session['ttt_board'] = ttt.create_board()
         session['ttt_current_player'] = 'X'
     
     board = session['ttt_board']
     current_player = session['ttt_current_player']
     
+    # Make move
     success, message = ttt.make_move(board, row, col, current_player)
     
     if not success:
         return jsonify({'success': False, 'message': message})
     
+    # Check for winner
     winner = ttt.check_winner(board)
     
     # Update session
