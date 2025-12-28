@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineSweeper - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: MS Sans Serif, Arial, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c2f 50%, #2d5016 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Doodle background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(144, 238, 144, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(144, 238, 144, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(152, 251, 152, 0.12) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Doodle decorations */
+        body::after {
+            content: '✕ ◆ ○ ◆ ✕ ○ ✕ ◆ ○ ✕ ◆ ✕ ○ ◆ ○ ✕ ◆ ✕ ○ ◆ ✕ ○ ◆';
+            position: fixed;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            font-size: 32px;
+            color: rgba(144, 238, 144, 0.2);
+            line-height: 1;
+            pointer-events: none;
+            z-index: -1;
+            white-space: nowrap;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+            }
+        }
+
+        .login-container {
+            background: linear-gradient(135deg, #b6fcb6 0%, #a8f5a8 100%);
+            border: 3px solid;
+            border-color: #ffffff #4a7c2f #4a7c2f #ffffff;
+            box-shadow: 
+                3px 3px 0 #2d5016,
+                1px 1px 0 #dfdfdf, 
+                -1px -1px 0 #ffffff, 
+                inset 1px 1px 0 #ffffff, 
+                inset -1px -1px 0 #4a7c2f;
+            padding: 40px 50px;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(144, 238, 144, 0.1) 10px,
+                rgba(144, 238, 144, 0.1) 20px
+            );
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d5016;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #4a7c2f;
+            font-size: 14px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d5016;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 8px;
+            font-family: MS Sans Serif, Arial, sans-serif;
+            font-size: 14px;
+            border: 2px solid;
+            border-color: #4a7c2f #ffffff #ffffff #4a7c2f;
+            background-color: #ffffff;
+            color: #2d5016;
+            transition: all 0.1s;
+            box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #2d5016;
+            background-color: #fffacd;
+            box-shadow: inset 1px 1px 2px rgba(45, 80, 22, 0.2), 0 0 8px rgba(144, 238, 144, 0.6);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 35px;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            background: linear-gradient(180deg, #6ba86b 0%, #4a7c2f 100%);
+            border: 2px solid;
+            border-color: #ffffff #2d5016 #2d5016 #ffffff;
+            box-shadow: 3px 3px 0 rgba(45, 80, 22, 0.4), 1px 1px 0 #dfdfdf, -1px -1px 0 #ffffff;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            font-family: MS Sans Serif, Arial, sans-serif;
+            min-width: 120px;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(45, 80, 22, 0.4), 2px 2px 0 #dfdfdf, -2px -2px 0 #ffffff;
+        }
+
+        button:active {
+            transform: translateY(1px);
+            border-color: #2d5016 #ffffff #ffffff #2d5016;
+            box-shadow: inset 2px 2px 0 rgba(45, 80, 22, 0.3);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #2d5016;
+        }
+
+        .signup-link a {
+            color: #2d5016;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .signup-link a:hover {
+            color: #4a7c2f;
+        }
+
+        /* Doodle decorative elements */
+        .doodle {
+            position: absolute;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .doodle-1 {
+            top: 5%;
+            right: 5%;
+            font-size: 48px;
+            animation: rotate 6s linear infinite;
+        }
+
+        .doodle-2 {
+            bottom: 10%;
+            left: 3%;
+            font-size: 40px;
+            animation: bob 4s ease-in-out infinite;
+        }
+
+        .doodle-3 {
+            top: 20%;
+            left: 8%;
+            font-size: 36px;
+            animation: sway 5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(10px); }
+        }
+        /* Subtle grid background overlay */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0px, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 40px),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0px, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 40px);
+            z-index: -2;
+        }
+
+        /* Extra doodles */
+        .doodle-4 { top: 70%; left: 70%; font-size: 44px; animation: drift 9s ease-in-out infinite; }
+        .doodle-5 { top: 12%; left: 78%; font-size: 36px; animation: pulse 3.5s ease-in-out infinite; }
+        .doodle-6 { bottom: 12%; right: 12%; font-size: 40px; animation: swaySlow 7s ease-in-out infinite; }
+        .doodle-7 { top: 30%; right: 30%; font-size: 34px; animation: zigzag 6s linear infinite; }
+        .doodle-8 { bottom: 22%; left: 60%; font-size: 46px; animation: floatX 10s linear infinite; }
+
+        @keyframes drift {
+            0%   { transform: translate(0, 0); }
+            50%  { transform: translate(15px, -10px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes zigzag {
+            0%   { transform: translate(0, 0); }
+            25%  { transform: translate(12px, -8px); }
+            50%  { transform: translate(0, -16px); }
+            75%  { transform: translate(-12px, -8px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        @keyframes swaySlow {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(18px); }
+        }
+
+        @keyframes floatX {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(8deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="doodle doodle-1">✕</div>
+    <div class="doodle doodle-2">◆</div>
+    <div class="doodle doodle-3">○</div>
+    <div class="doodle doodle-4">🚩</div>
+    <div class="doodle doodle-5">★</div>
+    <div class="doodle doodle-6">✦</div>
+    <div class="doodle doodle-7">▲</div>
+    <div class="doodle doodle-8">◉</div>
+
+    <div class="login-container">
+        <h1>MineSweeper</h1>
+        <p class="subtitle">Let's play!</p>
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            <div class="button-group">
+                <button type="submit">Login</button>
+            </div>
+        </form>
+        <div class="signup-link">
+            Don't have an account? <a href="/signup">Sign up here</a>
+        </div>
+    </div>
+</body>
+</html>

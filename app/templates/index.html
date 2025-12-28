@@ -6,19 +6,33 @@
     <title>Sample HTML Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
 <body>
-    <h1 id="title">MineSweeper</h1>
-    <div id="gameOverMessage" class="game-over">GAME OVER!</div>
-    <div id="victoryMessage" class="game-over" style="color: green">YOU WIN!</div>
-    <div class="grid" style="--cols: {{m}};">
-        {% for i in range(n) %} 
-            {% for j in range(m) %}
-                <div class="cell" onClick="revealCell(this, {{i}}, {{j}})"></div>
+    <div class="bg-grid"></div>
+    <div class="doodle doodle-1">✕</div>
+    <div class="doodle doodle-2">◆</div>
+    <div class="doodle doodle-3">○</div>
+    <div class="doodle doodle-4">🚩</div>
+    <div class="doodle doodle-5">★</div>
+    <div class="doodle doodle-6">✦</div>
+    <div class="doodle doodle-7">▲</div>
+    <div class="doodle doodle-8">◉</div>
+
+    <div class="game-container">
+        <h1 id="title">MineSweeper</h1>
+        <div id="gameOverMessage" class="game-over">GAME OVER!</div>
+        <div id="victoryMessage" class="game-over" style="color: green">YOU WIN!</div>
+        <div class="grid" style="--cols: {{m}};">
+            {% for i in range(n) %} 
+                {% for j in range(m) %}
+                    <div class="cell" onClick="revealCell(this, {{i}}, {{j}})" onContextMenu="flagCell(event, this)"></div>
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
-    </div>
-    <div class="controls">
-        <button class="hint" onClick="restartGame()">Restart Game</button>
-        <button class="hint">Hint</button>
+        </div>
+        <div class="controls">
+            <button class="hint" onClick="restartGame()">Restart Game</button>
+            <button class="hint">Hint</button>
+            <button class="hint" onClick="window.location.href='/'">Home</button>
+            <button class="hint" onClick="window.location.href='/logout'">Logout</button>
+        </div>
     </div>
     <script>
         async function revealCell(cell, row, col) {
@@ -54,6 +68,13 @@
 
             if (data.victory === true) {
                 document.getElementById('victoryMessage').style.display = 'block';
+            }
+        }
+        
+        function flagCell(event, cell) {
+            event.preventDefault();
+            if (!cell.classList.contains('revealed')) {
+                cell.classList.toggle('flagged');
             }
         }
         async function restartGame() {

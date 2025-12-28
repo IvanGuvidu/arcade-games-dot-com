@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <style>
+        table {
+            margin: 0 auto;
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid black;
+            height: 100px;
+            width: 100px;
+            text-align: center;
+            font-size: 64px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="doodle doodle-1">✕</div>
+    <div class="doodle doodle-2">◆</div>
+    <div class="doodle doodle-3">○</div>
+
+    <div class="game-container">
+        <h1 id="title">Tic Tac Toe</h1>
+        <p id="gameStatus" style="text-align:center; color:#2d5016; font-size:18px; margin-bottom:15px;">Player X's turn</p>
+        <table class="tic-tac-toe-board">
+            {% for i in range(3) %}
+            <tr>
+                {% for j in range(3) %}
+                <td id="cell-{{i}}-{{j}}" onclick="makeMove({{i}}, {{j}})"> </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="controls">
+            <button class="hint" onClick="restartGame()">Restart Game</button>
+            <button class="hint" onClick="window.location.href='/'">Home</button>
+            <button class="hint" onClick="window.location.href='/logout'">Logout</button>
+        </div>
+    </div>
+    
+    <script>
+        let gameOver = false;
+
+        async function makeMove(row, col) {
+            if (gameOver) return;
+
+            const cell = document.getElementById(`cell-${row}-${col}`);
+            if (cell.innerText.trim() !== '') return; // Cell already occupied
+
+            try {
+                const response = await fetch('/tic-tac-toe/move', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ row: row, col: col })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    alert(data.message);
+                    return;
+                }
+
+                // Update the board
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        const boardCell = document.getElementById(`cell-${i}-${j}`);
+                        boardCell.innerText = data.board[i][j];
+                        if (data.board[i][j] === 'X') {
+                            boardCell.style.color = '#1976d2';
+                        } else if (data.board[i][j] === 'O') {
+                            boardCell.style.color = '#d32f2f';
+                        }
+                    }
+                }
+
+                const statusElement = document.getElementById('gameStatus');
+
+                if (data.gameOver) {
+                    gameOver = true;
+                    if (data.winner === 'draw') {
+                        statusElement.innerText = "It's a draw!";
+                        statusElement.style.color = '#ff8f00';
+                    } else {
+                        statusElement.innerText = `Player ${data.winner} wins!`;
+                        statusElement.style.color = '#2e7d32';
+                    }
+                } else {
+                    statusElement.innerText = `Player ${data.nextPlayer}'s turn`;
+                    statusElement.style.color = '#2d5016';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to make move');
+            }
+        }
+
+        async function restartGame() {
+            try {
+                const response = await fetch('/tic-tac-toe/restart', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    gameOver = false;
+                    // Clear all cells
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 3; j++) {
+                            const cell = document.getElementById(`cell-${i}-${j}`);
+                            cell.innerText = ' ';
+                        }
+                    }
+                    document.getElementById('gameStatus').innerText = `Player ${data.currentPlayer}'s turn`;
+                    document.getElementById('gameStatus').style.color = '#2d5016';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to restart game');
+            }
+        }
+    </script>
+</body>
+</html>
