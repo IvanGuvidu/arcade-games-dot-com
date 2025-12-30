@@ -63,24 +63,66 @@ def login():
 
     if request.method == 'POST':
         username = request.form.get('username')
-        session['logged_in'] = True
-        session['username'] = username or 'Player'
-
-        username = request.form.get('username')
-        session['logged_in'] = True
-        session['username'] = username or 'Player'
-
-        session['board'] = None
-        session['first_move'] = True
-        session['revealed_cells'] = []
-
-        return redirect(url_for('home'))
+        password = request.form.get('password')
+        
+        users = session.get('users', {})
+        if username in users and users[username] == password:
+            session['logged_in'] = True
+            session['username'] = username
+            session['board'] = None
+            session['first_move'] = True
+            session['revealed_cells'] = []
+            return redirect(url_for('home'))
+        else:
+            return render_template('login.html', error='Invalid username or password')
 
     return render_template('login.html')
 
+@current_app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if session.get('logged_in'):
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not username or len(username) < 3:
+            return render_template('signup.html', error='Username must be at least 3 characters')
+        
+        if not password or len(password) < 6:
+            return render_template('signup.html', error='Password must be at least 6 characters')
+        
+        if password != confirm_password:
+            return render_template('signup.html', error='Passwords do not match')
+
+        if 'users' not in session:
+            session['users'] = {}
+        
+        users = session.get('users', {})
+        if username in users:
+            return render_template('signup.html', error='Username already exists')
+        
+        users[username] = password
+        session['users'] = users
+        
+        session['logged_in'] = True
+        session['username'] = username
+        session['board'] = None
+        session['first_move'] = True
+        session['revealed_cells'] = []
+        
+        return redirect(url_for('home'))
+
+    return render_template('signup.html')
+
 @current_app.route('/logout')
 def logout():
+    users = session.get('users', {})
     session.clear()
+    session['users'] = users
     return redirect(url_for('home'))
 
 @current_app.route('/restart', methods=['POST'])
