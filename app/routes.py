@@ -65,7 +65,6 @@ def tic_tac_toe():
 
 @current_app.route('/login', methods=['GET', 'POST'])
 def login():
-    # If already logged in, go to home
     if session.get('logged_in'):
         return redirect(url_for('home'))
 
@@ -76,23 +75,19 @@ def login():
 
         # Minimal login: accept any credentials and mark session
         username = request.form.get('username')
-        # password is received but not validated in this simple demo
         session['logged_in'] = True
         session['username'] = username or 'Player'
 
-        # Reset game state on login
         session['board'] = None
         session['first_move'] = True
         session['revealed_cells'] = []
 
         return redirect(url_for('home'))
 
-    # GET -> render login page
     return render_template('login.html')
 
 @current_app.route('/logout')
 def logout():
-    # Clear session and return to login
     session.clear()
     return redirect(url_for('home'))
 
@@ -198,22 +193,27 @@ def tic_tac_toe_move():
     row = data['row']
     col = data['col']
     
+<<<<<<< HEAD
     if 'ttt_board' not in session:
+=======
+<<<<<<< HEAD
+>>>>>>> ca5380d (ce fac aici)
     # Initialize board if not exists or is None
     if 'ttt_board' not in session or session['ttt_board'] is None:
+=======
+    if 'ttt_board' not in session:
+>>>>>>> dd357ef (remove comm)
         session['ttt_board'] = ttt.create_board()
         session['ttt_current_player'] = 'X'
     
     board = session['ttt_board']
     current_player = session['ttt_current_player']
     
-    # Make move
     success, message = ttt.make_move(board, row, col, current_player)
     
     if not success:
         return jsonify({'success': False, 'message': message})
     
-    # Check for winner
     winner = ttt.check_winner(board)
     
     # Update session
